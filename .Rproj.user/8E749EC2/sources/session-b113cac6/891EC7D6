@@ -3,9 +3,9 @@
     "path": "C:/Users/laura/Downloads/Extensao/extensao-esqueleto.R",
     "project_path": "extensao-esqueleto.R",
     "type": "r_source",
-    "hash": "873775703",
+    "hash": "0",
     "contents": "",
-    "dirty": false,
+    "dirty": true,
     "created": 1776274965762.0,
     "source_on_save": false,
     "relative_order": 1,
@@ -13,15 +13,15 @@
         "tempName": "Untitled1",
         "source_window_id": "",
         "Source": "Source",
-        "cursorPosition": "49,0",
-        "scrollLine": "38"
+        "cursorPosition": "383,37",
+        "scrollLine": "371"
     },
     "folds": "",
-    "lastKnownWriteTime": 1776342515,
+    "lastKnownWriteTime": 1776355619,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1776342515058,
+    "last_content_update": 1777562155377,
     "read_only": false,
     "read_only_alternatives": []
 }
