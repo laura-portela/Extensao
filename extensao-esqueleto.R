@@ -1110,3 +1110,5 @@ write.csv(
 # Ao terminar a ETAPA 2 commite e envie para o repositório REMOTO com o comentário "Dados da UF e Script Etapa 2"
 # Faça um merge de script de SIM para main
 
+rstudioapi::getActiveDocumentContext()$path
+
