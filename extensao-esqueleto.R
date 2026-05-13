@@ -1110,5 +1110,142 @@ write.csv(
 # Ao terminar a ETAPA 2 commite e envie para o repositório REMOTO com o comentário "Dados da UF e Script Etapa 2"
 # Faça um merge de script de SIM para main
 
-rstudioapi::getActiveDocumentContext()$path
+  #####################################################
+# ETAPA 3: OUTROS BANCOS DE DADOS: IBGE, SNIS, ...
+#####################################################
+# Só inicie esta Etapa quando a professora orientar
+# Ao terminar a ETAPA 2 faça um merge de SIM para main
+# Altere as orientações do script e commit (em main) "Script com orientações ETAPA 3 - SIDRA"
+# Abra um branch OUTROS
+# Na branch OUTROS escreva os comandos da Tarefa 1 abaixo
+
+# Tarefa 1. Acesso aos bancos de dados do SIDRA e obtenção da informação
+# Leia os arquivos:
+# 1. população residente estimada - UF e municípios - 2015 - SIDRA - tabela_6579.csv  
+dados1 <- read.csv2("C:/Users/laura/Downloads/população residente estimada - UF e municípios - 2015 - SIDRA - tabela_6579.csv")
+
+# 2. população residente censo 2010 - UF e municípios - total e por sexo - SIDRA - tabela_1552.csv  
+dados2 <- read.csv2("C:/Users/laura/Downloads/população residente censo 2010 - por faixa etária e sexo -  municípios - SIDRA - tabela_1552.csv")
+
+# 3. população residente censo 2010 - por faixa etária -  UF - SIDRA - tabela_1552.csv
+dados3 <- read.csv2("C:/Users/laura/Downloads/população residente censo 2010 - UF e municípios - total e por sexo - SIDRA - tabela_1552.csv")
+
+# 4. população residente censo 2010 - por faixa etária e sexo -  municípios - SIDRA - tabela_1552.csv
+dados4 <- read.csv2("C:/Users/laura/Downloads/população residente censo 2010 - por faixa etária -  UF - SIDRA - tabela_1552.csv")
+
+
+# A partir dos arquivos acima gere o banco de dados de nome SIDRA_UF com as seguintes variáveis:
+# 1  ANO    
+# 2  NIVEL
+# 3  CODMUNRES
+# 4 POPRE_T
+# 5 POPRC_T
+# 6 POPRC_M
+# 7 POPRC_F
+# 8 POPRC_15
+# 9 POPRC_15_49
+# 10 POPRC_50
+# 11 POPRC_F_15
+# 12 POPRC_F_15_49
+# 13 POPRC_F_50
+
+library(dplyr)
+library(stringr)
+
+dados1 <- dados1 %>%
+  filter(str_sub(CODMUNRES, 1, 2) == "28")
+
+dados2 <- dados2 %>%
+  filter(str_sub(CODMUNRES, 1, 2) == "28")
+
+dados3 <- dados3 %>%
+  filter(str_sub(CODMUNRES, 1, 2) == "28")
+
+dados4 <- dados4 %>%
+  filter(str_sub(CODMUNRES, 1, 2) == "28")
+
+faixa_idade <- dados2 %>%
+  mutate(
+    faixa = case_when(
+      F_IDADE < 15 ~ "POPRC_15",
+      F_IDADE >= 15 & F_IDADE <= 49 ~ "POPRC_15_49",
+      F_IDADE >= 50 ~ "POPRC_50"
+    )
+  ) %>%
+  group_by(CODMUNRES, faixa) %>%
+  summarise(valor = sum(POP, na.rm = TRUE),
+            .groups = "drop") %>%
+  tidyr::pivot_wider(
+    names_from = faixa,
+    values_from = valor
+  )
+
+faixa_feminina <- dados4 %>%
+  mutate(
+    faixa = case_when(
+      F_IDADE < 15 ~ "POPRC_F_15",
+      F_IDADE >= 15 & F_IDADE <= 49 ~ "POPRC_F_15_49",
+      F_IDADE >= 50 ~ "POPRC_F_50"
+    )
+  ) %>%
+  group_by(CODMUNRES, faixa) %>%
+  summarise(valor = sum(POPF, na.rm = TRUE),
+            .groups = "drop") %>%
+  tidyr::pivot_wider(
+    names_from = faixa,
+    values_from = valor
+  )
+
+base1 <- dados1 %>%
+  select(CODMUNRES, POPRE_T)
+
+base3 <- dados3 %>%
+  select(
+    CODMUNRES,
+    POPRC_T,
+    POPRC_M,
+    POPRC_F
+  )
+
+SIDRA_SE <- base1 %>%
+  left_join(base3, by = "CODMUNRES") %>%
+  left_join(faixa_idade, by = "CODMUNRES") %>%
+  left_join(faixa_feminina, by = "CODMUNRES")
+
+SIDRA_SE <- SIDRA_SE %>%
+  mutate(
+    ANO = 2015,
+    NIVEL = ifelse(
+      nchar(CODMUNRES) == 2,
+      "UF",
+      "MUNICIPIO"
+    )
+  )
+
+SIDRA_SE <- SIDRA_SE %>%
+  select(
+    ANO,
+    NIVEL,
+    CODMUNRES,
+    POPRE_T,
+    POPRC_T,
+    POPRC_M,
+    POPRC_F,
+    POPRC_15,
+    POPRC_15_49,
+    POPRC_50,
+    POPRC_F_15,
+    POPRC_F_15_49,
+    POPRC_F_50
+  )
+
+# Exporte o arquivo em formato CSV
+write.csv(
+  SIDRA_SE,
+  "SIDRA_SE.csv",
+  row.names = FALSE
+)
+
+# Faça o commit com a mensagem "Script e dados TAREFA 3 - SIDRA"
+
 
